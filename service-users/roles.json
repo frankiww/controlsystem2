@@ -1,0 +1,5 @@
+[
+    {"id": 1, "name": "admin"},
+    {"id": 2, "name": "engineer"},
+    {"id": 3, "name": "client"}
+]
