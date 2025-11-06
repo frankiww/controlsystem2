@@ -77,7 +77,7 @@ exports.createUser = async (req, res) => {
         name,
         roles,
         date_of_creation: new Date().toISOString(),
-        date_of_update: new Date().toISOString
+        date_of_update: new Date().toISOString()
     };
 
     users.push(newUser);
