@@ -1,0 +1,16 @@
+[
+  {
+    "id": "821a34ea-decd-40cf-a931-21ad3f88451b",
+    "userId": "1e721c94-902c-4c42-8ab5-f9cc51cc9dc3",
+    "order": [
+      {
+        "product1": 5,
+        "product2": 10
+      }
+    ],
+    "status": "Создан",
+    "total": 5000,
+    "date_of_creation": "2025-11-06T07:07:24.946Z",
+    "date_of_update": "2025-11-06T07:07:24.946Z"
+  }
+]
