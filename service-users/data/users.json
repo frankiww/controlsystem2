@@ -1,0 +1,33 @@
+[
+  {
+    "id": "67cda60b-3657-4391-b433-d518bf6dc0b2",
+    "email": "example2@gmail.com",
+    "password": "$2b$10$JuUwGIplDe93EoNuJL4B3O7hQ5pTWlMm5TP3YX7IaeMm0wIQ9LiZ2",
+    "name": "maria",
+    "roles": [
+      1
+    ],
+    "date_of_creation": "2025-11-06T06:16:48.055Z"
+  },
+  {
+    "id": "41797bf6-37ec-41b0-a382-af5791b304c0",
+    "email": "example@mail.ru",
+    "password": "$2b$10$OwKF1uMn1BRQuAZX3P9Fp.lHFbuIqyhNz.7hFZ3qiicn1DWIGqmnq",
+    "name": "sofia",
+    "roles": [
+      2
+    ],
+    "date_of_creation": "2025-11-06T06:17:53.113Z"
+  },
+  {
+    "id": "1e721c94-902c-4c42-8ab5-f9cc51cc9dc3",
+    "email": "example2@mail.ru",
+    "password": "$2b$10$usr.y4tQnRzWzHKickB8W.L8HWx2j.tLElnh6nvaH8AEMypd3OY.2",
+    "name": "anna",
+    "roles": [
+      1,
+      2
+    ],
+    "date_of_creation": "2025-11-06T06:18:05.566Z"
+  }
+]
