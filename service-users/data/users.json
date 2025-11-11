@@ -62,5 +62,17 @@
     ],
     "date_of_creation": "2025-11-11T10:50:09.414Z",
     "date_of_update": "2025-11-11T10:50:09.414Z"
+  },
+  {
+    "id": "507ba610-f4d3-436b-92c5-81b0af2e04a7",
+    "email": "newuser4@mail.ru",
+    "password": "123",
+    "name": "newUser4",
+    "roles": [
+      2,
+      3
+    ],
+    "date_of_creation": "2025-11-11T13:36:22.100Z",
+    "date_of_update": "2025-11-11T13:36:22.100Z"
   }
 ]
