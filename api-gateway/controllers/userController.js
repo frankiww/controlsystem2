@@ -3,7 +3,8 @@ const usersCircuit = require('../circuits/usersCircuit');
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await usersCircuit.fire(`${USERS_SERVICE_URL}/users`);
+    const queryString = new URLSearchParams(req.query).toString();
+    const users = await usersCircuit.fire(`${USERS_SERVICE_URL}/users${queryString ? '?' + queryString : ''}`);
     res.json(users);
   } catch {
     res.status(500).json({ error: 'Internal server error' });

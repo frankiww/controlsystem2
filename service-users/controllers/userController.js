@@ -19,15 +19,30 @@ function writeJSON(file, data) {
 }
 //получение всех
 exports.getAllUsers = (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const roleFilter = parseInt(req.query.role);
+
     const users = readJSON(usersData);
     const roles = readJSON(rolesData);
-    const result = users.map(u => ({
-            ...u,
-            roles: u.roles.map(roleId => {
-                const role = roles.find(r => r.id===roleId);
-                return role ? role.name : null;
-            }).filter(Boolean)
-        }));
+    let result = users;
+    if (roleFilter) {
+      result = result.filter(u => u.roles.includes(roleFilter));
+    }
+    result = result.map(u => ({
+          ...u,
+          roles: u.roles.map(roleId => {
+              const role = roles.find(r => r.id===roleId);
+              return role ? role.name : null;
+          }).filter(Boolean)
+      }));
+
+    if (page&&limit) {
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      result = result.slice(startIndex, endIndex);
+    }
+
 
     res.json({
         success: true,
