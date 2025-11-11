@@ -5,7 +5,7 @@ const {checkRoles} = require('../middleware/checkRoles');
 
 router.get('/', checkRoles(1,2), userController.getAllUsers);
 router.get('/:userId', userController.getUser);
-router.post('/', userController.createUser);
+router.post('/', checkRoles(1), userController.createUser);
 router.put('/:userId', userController.updateUser);
 router.delete('/:userId', userController.deleteUser);
 
