@@ -29,5 +29,38 @@
       2
     ],
     "date_of_creation": "2025-11-06T06:18:05.566Z"
+  },
+  {
+    "id": "64c79690-47e6-4451-85ee-899c9d771115",
+    "email": "newuser@mail.ru",
+    "password": "$2b$10$.WEe9sXP2DRA30zVhyDQROnsgltBr22HHa2nwzJtqT7Ao2rj9vRUe",
+    "name": "newUser",
+    "roles": [
+      3
+    ],
+    "date_of_creation": "2025-11-11T10:25:34.406Z",
+    "date_of_update": "2025-11-11T10:25:34.406Z"
+  },
+  {
+    "id": "e6d0830f-3c96-4a98-9fee-17dab313ee38",
+    "email": "newuser2@mail.ru",
+    "password": "$2b$10$9FBY8Vph/otk6ScjoKl4q.0v6edCJTF1Bgpa/4TozTqGWnSwmyj7m",
+    "name": "newUser2",
+    "roles": [
+      3
+    ],
+    "date_of_creation": "2025-11-11T10:38:23.729Z",
+    "date_of_update": "2025-11-11T10:38:23.729Z"
+  },
+  {
+    "id": "98b5ef1b-d484-4438-b31e-eff8b9cbd674",
+    "email": "newuser3@mail.ru",
+    "password": "$2b$10$T9RjF5p85PjJbBLo.NDIbut5e.gmFnx8iklmaAoWotqqR2cGsc2VK",
+    "name": "newUser3",
+    "roles": [
+      3
+    ],
+    "date_of_creation": "2025-11-11T10:50:09.414Z",
+    "date_of_update": "2025-11-11T10:50:09.414Z"
   }
 ]

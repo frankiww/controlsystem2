@@ -7,6 +7,8 @@ const PORT = process.env.PORT || 8080;
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const aggregRoutes = require("./routes/aggregRoutes");
+const authRoutes = require("./routes/authRoutes");
+
 
 
 
@@ -15,6 +17,7 @@ app.use(cors())
 
 app.use('/users', aggregRoutes);
 app.use('/users', userRoutes);
+app.use('/auth', authRoutes);
 app.use('/orders', orderRoutes);
 
 

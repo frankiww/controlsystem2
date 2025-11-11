@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', userController.getAllUsers);
+router.get('/by-email/:email', userController.getUserByEmail);
 router.get('/health', userController.healthCheck);
 router.get('/status', userController.statusCheck);
 router.get('/:userId', userController.getUserById);

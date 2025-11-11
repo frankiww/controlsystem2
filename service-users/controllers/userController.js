@@ -59,21 +59,43 @@ exports.getUserById = (req, res) => {
         }
     });
 };
+//получение по email
+exports.getUserByEmail = async (req, res) => {
+  try {
+    const users = readJSON(usersData);
+    const { email } = req.params;
+    const user = users.find(u => u.email===email);
+    if (!user) return res.status(404).json({
+        success: false,
+        error: {code: 404, message: 'Пользователь не найден'}
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    console.error('Ошибка при поиске пользователя по email:', error.message);
+    return res.status(500).json({
+      success: false,
+      error: 'Ошибка сервера при поиске пользователя'
+    });
+  }
+};
 //добавить
 exports.createUser = async (req, res) => {
     const users = readJSON(usersData);
     const {email, password, name, roles} = req.body;
 
     if (users.some(u => u.email === email)) {
-        return res.status(400).json({ success: false, error: { code: 400, message: 'Этот email уже используется' } });
+        return res.status(404).json({ success: false, error: { code: 404, message: 'Этот email уже используется' } });
     }
 
     const { v4: uuid } = await import('uuid');
-    const hasedPassword = await bcrypt.hash(password, 10);
     const newUser = {
         id: uuid(),
         email,
-        password: hasedPassword,
+        password: password,
         name,
         roles,
         date_of_creation: new Date().toISOString(),
@@ -137,3 +159,4 @@ exports.healthCheck = (req, res) => {
 exports.statusCheck = (req, res) => {
   res.json({ status: 'Users service is running' });
 };
+
