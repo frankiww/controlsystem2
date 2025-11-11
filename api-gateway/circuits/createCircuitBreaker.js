@@ -13,7 +13,7 @@ function createCircuitBreaker(serviceName) {
       const response = await axios({
         url,
         ...options,
-        validateStatus: s => (s >= 200 && s < 300) || s === 404
+        validateStatus: () => true //s => (s >= 200 && s < 300) || s === 404
       });
       return response.data;
     } catch (err) {
