@@ -6,6 +6,9 @@ exports.getAllUsers = async (req, res) => {
   try {
     const queryString = new URLSearchParams(req.query).toString();
     const users = await usersCircuit.fire(`${USERS_SERVICE_URL}/users${queryString ? '?' + queryString : ''}`);
+    if (!users.success){
+      res.status(users.error?.code || 400).json(users)
+    }
     res.json(users);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
@@ -18,7 +21,9 @@ exports.getUser = async (req, res) => {
     const user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${req.params.userId}`, {
       headers: {authorization: token}
     });
-    if (user.error === 'User not found') return res.status(404).json(user);
+    if (!user.success){
+      res.status(user.error?.code || 400).json(user)
+    }
     res.json(user);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
