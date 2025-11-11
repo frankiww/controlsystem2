@@ -13,7 +13,10 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
-    const user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${req.params.userId}`);
+    const token = req.headers.authorization;
+    const user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${req.params.userId}`, {
+      headers: {authorization: token}
+    });
     if (user.error === 'User not found') return res.status(404).json(user);
     res.json(user);
   } catch {

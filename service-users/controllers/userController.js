@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-// const { v4: uuid } = require('uuid');
-const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config/jwt');
 
 
 const dataPath = path.join(process.cwd(),'data');
@@ -16,6 +16,18 @@ function readJSON(file) {
 
 function writeJSON(file, data) {
     fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+function getUserFromToken(req) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return null;
+
+  const token = authHeader.split(' ')[1];
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
 }
 //получение всех
 exports.getAllUsers = (req, res) => {
@@ -53,6 +65,7 @@ exports.getAllUsers = (req, res) => {
 };
 //получение по айди
 exports.getUserById = (req, res) => {
+    const currentUser = getUserFromToken(req);
     const users = readJSON(usersData);
     const userId = req.params.userId;
     const user = users.find(u => u.id===userId);
@@ -60,12 +73,19 @@ exports.getUserById = (req, res) => {
         success: false,
         error: {code: 404, message: 'Пользователь не найден'}
     });
+      
+    const isManager = currentUser.roles.includes(1); 
 
     const roleNames = user.roles.map(roleId => {
             const role = readJSON(rolesData).find(r => r.id===roleId);
             return role ? role.name : null;
         }).filter(Boolean)
     
+
+  
+    if (!isManager&&currentUser.id!==user.id){
+          return res.status(403).json({ success: false, error: 'Доступ запрещён' });
+    }
     res.json({
         success: true,
         data: {
