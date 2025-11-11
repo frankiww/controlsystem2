@@ -57,10 +57,15 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
+    const token = req.headers.authorization;
     const user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${req.params.userId}`, {
       method: 'PUT',
+      headers: {authorization: token},
       data: req.body
     });
+    if (!user.success){
+      res.status(user.error?.code || 400).json(user)
+    }
     res.json(user);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
@@ -69,9 +74,14 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
+    const token = req.headers.authorization;
     const result = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${req.params.userId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {authorization: token}
     });
+    if (!result.success){
+      res.status(result.error?.code || 400).json(result)
+    }
     res.json(result);
   } catch {
     res.status(500).json({ error: 'Internal server error' });

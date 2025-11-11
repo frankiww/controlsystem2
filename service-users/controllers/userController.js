@@ -145,14 +145,30 @@ exports.createUser = async (req, res) => {
 };
 //обновить
 exports.updateUser = async (req, res) => {
+    const currentUser = getUserFromToken(req);
     const users = readJSON(usersData);
     const userId = req.params.userId;
-    const updates = req.body;
+    const {email, name, roles} = req.body;
 
     const userIndex = users.findIndex(u => u.id === userId);
     if (userIndex === -1) return res.status(404).json({ 
         success: false, 
         error: { code: 404, message: 'Пользователь не найден' } });
+
+    const isManager = currentUser.roles.includes(1);
+    if (!isManager && currentUser.id !== userId) {
+      return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого пользователя' });
+    }
+
+    const updates = {};
+    if (email) {
+      if (users.some(u => u.email === email)) {
+        return res.status(404).json({ success: false, error: { code: 404, message: 'Этот email уже используется' } });
+      }
+      updates.email = email;
+    }
+    if (name) updates.name = name;
+    if (roles && isManager) updates.roles = roles;
 
     const updatedUser = {
     ...users[userIndex],
@@ -167,13 +183,27 @@ exports.updateUser = async (req, res) => {
 };
 //удалить
 exports.deleteUser = (req, res) => {
+  const currentUser = getUserFromToken(req);
   const userId = req.params.userId;
   const users = readJSON(usersData);
   const userIndex = users.findIndex(u => u.id === userId);
+  const isManager = currentUser.roles.includes(1);
+  if (!isManager && currentUser.id !== userId) {
+    return res.status(403).json({ success: false, error: 'Нет прав на удаление этого пользователя' });
+  }
   if (userIndex === -1) return res.status(404).json({ 
     success: false, 
     error: { code: 404, message: 'Пользователь не найден' } });
 
+  if (users[userIndex].roles.includes(1)) {
+    const allManagers = users.filter(u => u.roles.includes(1));
+    if (allManagers.length <= 1) {
+      return res.status(400).json({
+        success: false,
+        error: 'Невозможно удалить последнего менеджера'
+      });
+    }
+  }
   const deletedUser = users.splice(userIndex, 1)[0];
   writeJSON(usersData, users);
 

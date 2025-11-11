@@ -51,28 +51,5 @@
     ],
     "date_of_creation": "2025-11-11T10:38:23.729Z",
     "date_of_update": "2025-11-11T10:38:23.729Z"
-  },
-  {
-    "id": "98b5ef1b-d484-4438-b31e-eff8b9cbd674",
-    "email": "newuser3@mail.ru",
-    "password": "$2b$10$T9RjF5p85PjJbBLo.NDIbut5e.gmFnx8iklmaAoWotqqR2cGsc2VK",
-    "name": "newUser3",
-    "roles": [
-      3
-    ],
-    "date_of_creation": "2025-11-11T10:50:09.414Z",
-    "date_of_update": "2025-11-11T10:50:09.414Z"
-  },
-  {
-    "id": "507ba610-f4d3-436b-92c5-81b0af2e04a7",
-    "email": "newuser4@mail.ru",
-    "password": "123",
-    "name": "newUser4",
-    "roles": [
-      2,
-      3
-    ],
-    "date_of_creation": "2025-11-11T13:36:22.100Z",
-    "date_of_update": "2025-11-11T13:36:22.100Z"
   }
 ]
