@@ -4,6 +4,9 @@ const ordersCircuit = require('../circuits/ordersCircuit');
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders`);
+    if (!orders.success){
+      res.status(orders.error?.code || 400).json(orders)
+    }
     res.json(orders);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
@@ -12,8 +15,13 @@ exports.getAllOrders = async (req, res) => {
 
 exports.getOrder = async (req, res) => {
   try {
-    const order = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders/${req.params.orderId}`);
-    if (order.error === 'Otder not found') return res.status(404).json(order);
+    const token = req.headers.authorization;
+    const order = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders/${req.params.orderId}`, {
+      headers: {authorization: token}
+    });
+    if (!order.success){
+      res.status(order.error?.code || 400).json(order)
+    }
     res.json(order);
   } catch {
     res.status(500).json({ error: 'Internal server error' });

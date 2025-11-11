@@ -14,6 +14,18 @@ function readJSON(file) {
 function writeJSON(file, data) {
     fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
 }
+
+function getUserFromToken(req) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return null;
+
+  const token = authHeader.split(' ')[1];
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
+}
 //получение всех
 exports.getAllOrders = (req, res) => {
     let orders = readJSON(ordersData);
@@ -29,13 +41,22 @@ exports.getAllOrders = (req, res) => {
 };
 //получение по айди
 exports.getOrderById = (req, res) => {
+    const currentUser = getUserFromToken(req);
     const orders = readJSON(ordersData);
     const orderId = req.params.orderId;
     const order = orders.find(o => o.id===orderId);
+
+    const isManager = currentUser.roles.includes(1); 
+    const isEngineer = currentUser.roles.includes(2); 
+
     if (!order) return res.status(404).json({
         success: false,
         error: {code: 404, message: 'Заказ не найден'}
     });
+
+    if (!isManager&&!isEngineer&&currentUser.id!==order.userId){
+          return res.status(403).json({ success: false, error: 'Доступ запрещён' });
+    }
     
     res.json({
         success: true,
