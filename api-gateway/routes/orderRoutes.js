@@ -6,8 +6,8 @@ const {checkRoles} = require('../middleware/checkRoles');
 
 router.get('/', checkRoles(1,2), orderController.getAllOrders);
 router.get('/:orderId', orderController.getOrder);
-router.post('/', orderController.createOrder);
+router.post('/', checkRoles(1,3), orderController.createOrder);
 router.put('/:orderId', orderController.updateOrder);
-router.delete('/:orderId', orderController.deleteOrder);
+router.delete('/:orderId', checkRoles(1), orderController.deleteOrder);
 
 module.exports = router;

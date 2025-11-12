@@ -31,10 +31,15 @@ exports.getOrder = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
   try {
+    const token = req.headers.authorization;
     const order = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders`, {
       method: 'POST',
+      headers: {authorization: token},
       data: req.body
     });
+    if (!order.success){
+      res.status(order.error?.code || 400).json(order)
+    }
     res.status(201).json(order);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
@@ -43,8 +48,10 @@ exports.createOrder = async (req, res) => {
 
 exports.updateOrder = async (req, res) => {
   try {
+    const token = req.headers.authorization;
     const order = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders/${req.params.orderId}`, {
       method: 'PUT',
+      headers: {authorization: token},
       data: req.body
     });
     res.json(order);

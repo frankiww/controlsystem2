@@ -65,6 +65,7 @@ exports.getOrderById = (req, res) => {
 };
 //добавить
 exports.createOrder = async (req, res) => {
+    const currentUser = getUserFromToken(req);
     const orders = readJSON(ordersData);
     const {userId, order, total} = req.body;
 
@@ -82,6 +83,12 @@ exports.createOrder = async (req, res) => {
                 error: { code: 400, message: 'Пользователь не найден или сервис недоступен' }
             });
     }
+
+    const isManager = currentUser.roles.includes(1); 
+    if (!isManager&&currentUser.id!==userId){
+        return res.status(403).json({ success: false, error: 'Доступ запрещён' });
+    }
+
 
     const { v4: uuid } = await import('uuid');
     const newOrder = {
@@ -102,14 +109,42 @@ exports.createOrder = async (req, res) => {
 };
 //обновить
 exports.updateOrder = async (req, res) => {
+    const currentUser = getUserFromToken(req);
     const orders = readJSON(ordersData);
     const orderId = req.params.orderId;
-    const updates = req.body;
+    const {order, total, status} = req.body;
+    const updates = {};
 
     const orderIndex = orders.findIndex(o => o.id === orderId);
     if (orderIndex === -1) return res.status(404).json({ 
         success: false, 
         error: { code: 404, message: 'Заказ не найден' } });
+
+    const isManager = currentUser.roles.includes(1);
+    const isEngineer = currentUser.roles.includes(2);
+    const isClient = !isManager&&!isEngineer; 
+    if (isClient && currentUser.id !== userId) {
+      return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+    }
+
+    if (order) {
+        if (!isManager) updates.order = order;
+        else return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+    }
+    if (total) {
+        if (!isManager) updates.total = total;
+        else return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+    }
+    if (status) {
+        if (isClient&&orders[orderIndex].status!=="Создан"&&status!=="Отменен"){
+            return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+        }
+        if (isEngineer){
+            if (orders[orderIndex].status!=="Создан"&&status!=="В работе" || orders[orderIndex].status!=="В работе"&&status!=="Выполнен"&&status!=="Отменен") {
+                return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+            }
+        }
+    }
 
     const updateOrder = {
     ...orders[orderIndex],
