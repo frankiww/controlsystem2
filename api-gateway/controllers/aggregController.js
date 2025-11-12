@@ -10,7 +10,7 @@ exports.getUserWithOrders = async (req, res) => {
     const ordersPromise = ordersCircuit
       .fire(`${ORDERS_SERVICE_URL}/orders`)
       .then(response => {
-        const orders = response.data || []; // извлекаем массив заказов
+        const orders = response.data || [];
         return orders.filter(order => order.userId == userId);
       });
 
@@ -22,7 +22,7 @@ exports.getUserWithOrders = async (req, res) => {
 
     const user = userResponse.data || userResponse;
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         user,
@@ -30,7 +30,7 @@ exports.getUserWithOrders = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: 'Internal server error'
     });

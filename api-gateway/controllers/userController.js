@@ -7,11 +7,11 @@ exports.getAllUsers = async (req, res) => {
     const queryString = new URLSearchParams(req.query).toString();
     const users = await usersCircuit.fire(`${USERS_SERVICE_URL}/users${queryString ? '?' + queryString : ''}`);
     if (!users.success){
-      res.status(users.error?.code || 400).json(users)
+      return res.status(users.error?.code || 400).json(users)
     }
-    res.json(users);
+    return res.json(users);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -22,11 +22,11 @@ exports.getUser = async (req, res) => {
       headers: {authorization: token}
     });
     if (!user.success){
-      res.status(user.error?.code || 400).json(user)
+      return res.status(user.error?.code || 400).json(user)
     }
-    res.json(user);
+    return res.json(user);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -54,9 +54,9 @@ exports.createUser = async (req, res) => {
           error: user.error || 'Ошибка при создании пользователя'
         });
       }
-    res.status(201).json(user);
+    return res.status(201).json(user);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -69,11 +69,11 @@ exports.updateUser = async (req, res) => {
       data: req.body
     });
     if (!user.success){
-      res.status(user.error?.code || 400).json(user)
+      return res.status(user.error?.code || 400).json(user)
     }
-    res.json(user);
+    return res.json(user);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -85,10 +85,10 @@ exports.deleteUser = async (req, res) => {
       headers: {authorization: token}
     });
     if (!result.success){
-      res.status(result.error?.code || 400).json(result)
+      return res.status(result.error?.code || 400).json(result)
     }
-    res.json(result);
+    return res.json(result);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };

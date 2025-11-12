@@ -52,13 +52,11 @@ exports.login = async (req, res) =>  {
       return res.status(404).json({ success: false, error: 'Пользователь не найден' });
     }
 
-    // Проверяем пароль
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, error: 'Неверный пароль' });
     }
 
-    // Формируем токен
     const token = jwt.sign(
       { id: user.id, roles: user.roles, email: user.email },
       JWT_SECRET,

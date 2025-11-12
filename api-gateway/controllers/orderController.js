@@ -5,11 +5,11 @@ exports.getAllOrders = async (req, res) => {
   try {
     const orders = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders`);
     if (!orders.success){
-      res.status(orders.error?.code || 400).json(orders)
+      return res.status(orders.error?.code || 400).json(orders)
     }
-    res.json(orders);
+    return res.json(orders);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -20,11 +20,11 @@ exports.getOrder = async (req, res) => {
       headers: {authorization: token}
     });
     if (!order.success){
-      res.status(order.error?.code || 400).json(order)
+      return res.status(order.error?.code || 400).json(order)
     }
-    res.json(order);
+    return res.json(order);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -38,11 +38,11 @@ exports.createOrder = async (req, res) => {
       data: req.body
     });
     if (!order.success){
-      res.status(order.error?.code || 400).json(order)
+      return res.status(order.error?.code || 400).json(order)
     }
-    res.status(201).json(order);
+    return res.status(201).json(order);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -55,11 +55,11 @@ exports.updateOrder = async (req, res) => {
       data: req.body
     });
     if (!order.success){
-      res.status(order.error?.code || 400).json(order)
+      return res.status(order.error?.code || 400).json(order)
     }
-    res.json(order);
+    return res.json(order);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -69,10 +69,10 @@ exports.deleteOrder = async (req, res) => {
       method: 'DELETE'
     });
     if (!order.success){
-      res.status(order.error?.code || 400).json(order)
+      return res.status(order.error?.code || 400).json(order)
     }
-    res.json(result);
+    return res.json(result);
   } catch {
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
