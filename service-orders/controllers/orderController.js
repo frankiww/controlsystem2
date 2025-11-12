@@ -1,9 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
 
 const dataPath = path.join(process.cwd(),'data');
 const ordersData = path.join(dataPath, 'orders.json');
+const { JWT_SECRET } = require('../config/jwt');
+const { USERS_SERVICE_URL } = require('../config/services');
+
 
 function readJSON(file) {
     if (!fs.existsSync(file)) return [];
@@ -65,12 +69,19 @@ exports.getOrderById = (req, res) => {
 };
 //добавить
 exports.createOrder = async (req, res) => {
+    const authHeader = req.headers.authorization;
     const currentUser = getUserFromToken(req);
     const orders = readJSON(ordersData);
     const {userId, order, total} = req.body;
 
+    if (!userId||!order||!total){
+      return res.status(400).json({ success: false, error: 'Не все поля заполнены' });
+    }
+
     try {
-        const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
+        const response = await axios.get(`${USERS_SERVICE_URL}/users/${userId}`, {
+            headers: {authorization: authHeader}
+        });
         if (!response.data.success) {
             return res.status(400).json({
             success: false,
@@ -123,7 +134,7 @@ exports.updateOrder = async (req, res) => {
     const isManager = currentUser.roles.includes(1);
     const isEngineer = currentUser.roles.includes(2);
     const isClient = !isManager&&!isEngineer; 
-    if (isClient && currentUser.id !== userId) {
+    if (isClient && currentUser.id !== orders[orderIndex].userId) {
       return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
     }
 
@@ -132,18 +143,28 @@ exports.updateOrder = async (req, res) => {
         else return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
     }
     if (total) {
-        if (!isManager) updates.total = total;
+        if (isManager) updates.total = total;
         else return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
     }
     if (status) {
-        if (isClient&&orders[orderIndex].status!=="Создан"&&status!=="Отменен"){
-            return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
-        }
-        if (isEngineer){
-            if (orders[orderIndex].status!=="Создан"&&status!=="В работе" || orders[orderIndex].status!=="В работе"&&status!=="Выполнен"&&status!=="Отменен") {
+        if (isClient){
+            const current = orders[orderIndex].status;
+            const allowed = (current === "Создан" && status === "Отменен");
+            if (!allowed) {
                 return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
             }
         }
+        if (isEngineer) {
+            const current = orders[orderIndex].status;
+            const allowed =
+                (current === "Создан" && status === "В работе") ||
+                (current === "В работе" && ["Выполнен", "Отменен"].includes(status));
+
+            if (!allowed) {
+                return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+            }
+        }
+        updates.status = status;
     }
 
     const updateOrder = {

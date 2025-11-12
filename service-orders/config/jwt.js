@@ -1,0 +1,4 @@
+module.exports = {
+  JWT_SECRET: 'super_secret_key',
+  JWT_EXPIRES_IN: '2h'
+};

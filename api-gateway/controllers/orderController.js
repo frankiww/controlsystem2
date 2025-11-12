@@ -54,6 +54,9 @@ exports.updateOrder = async (req, res) => {
       headers: {authorization: token},
       data: req.body
     });
+    if (!order.success){
+      res.status(order.error?.code || 400).json(order)
+    }
     res.json(order);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
@@ -65,6 +68,9 @@ exports.deleteOrder = async (req, res) => {
     const result = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders/${req.params.orderId}`, {
       method: 'DELETE'
     });
+    if (!order.success){
+      res.status(order.error?.code || 400).json(order)
+    }
     res.json(result);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
