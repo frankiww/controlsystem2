@@ -4,8 +4,11 @@ const bcrypt = require('bcryptjs');
 
 exports.getAllUsers = async (req, res) => {
   try {
+    const requestId = req.requestId;
     const queryString = new URLSearchParams(req.query).toString();
-    const users = await usersCircuit.fire(`${USERS_SERVICE_URL}/users${queryString ? '?' + queryString : ''}`);
+    const users = await usersCircuit.fire(`${USERS_SERVICE_URL}/users${queryString ? '?' + queryString : ''}`, {
+      headers: {'x-request-id' : requestId}
+    });
     if (!users.success){
       return res.status(users.error?.code || 400).json(users)
     }
@@ -17,9 +20,10 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
+    const requestId = req.requestId;
     const token = req.headers.authorization;
     const user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${req.params.userId}`, {
-      headers: {authorization: token}
+      headers: {authorization: token, 'x-request-id' : requestId}
     });
     if (!user.success){
       return res.status(user.error?.code || 400).json(user)
@@ -33,6 +37,7 @@ exports.getUser = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   try {
+    const requestId = req.requestId;
     const { name, password, email, roles } = req.body;
 
     if (!name || !password || !email || !roles) {
@@ -41,6 +46,7 @@ exports.createUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users`, {
       method: 'POST',
+      headers: {'x-request-id' : requestId},
       data: {
         email,
         password: hashedPassword,
@@ -62,10 +68,11 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   try {
+    const requestId = req.requestId;
     const token = req.headers.authorization;
     const user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${req.params.userId}`, {
       method: 'PUT',
-      headers: {authorization: token},
+      headers: {authorization: token, 'x-request-id' : requestId},
       data: req.body
     });
     if (!user.success){
@@ -79,10 +86,11 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
+    const requestId = req.requestId;
     const token = req.headers.authorization;
     const result = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${req.params.userId}`, {
       method: 'DELETE',
-      headers: {authorization: token}
+      headers: {authorization: token, 'x-request-id' : requestId}
     });
     if (!result.success){
       return res.status(result.error?.code || 400).json(result)

@@ -8,13 +8,19 @@ const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const aggregRoutes = require("./routes/aggregRoutes");
 const authRoutes = require("./routes/authRoutes");
+
 const authMiddleware = require('./middleware/authMiddleware');
-
-
+const requestIdMiddleware = require('./middleware/requestIdMiddleware');
 
 
 app.use(express.json());
-app.use(cors())
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
+    exposedHeaders: ['X-Request-ID']
+}));
+app.use(requestIdMiddleware);
 app.use('/auth', authRoutes);
 
 app.use(authMiddleware);

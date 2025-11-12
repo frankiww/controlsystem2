@@ -7,6 +7,7 @@ const usersCircuit = require('../circuits/usersCircuit');
 
 exports.register = async (req, res) => {
   try {
+    const requestId = req.requestId;
     const { name, password, email } = req.body;
 
     if (!name || !password || !email) {
@@ -16,6 +17,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const response = await usersCircuit.fire(`${USERS_SERVICE_URL}/users`, {
       method: 'POST',
+      headers: {'x-request-id' : requestId},
       data: {
         email,
         password: hashedPassword,
@@ -40,12 +42,15 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) =>  {
   try {
+    const requestId = req.requestId;
     const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ success: false, error: 'Введите логин и пароль' });
     }
-    const response = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/by-email/${email}`);
+    const response = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/by-email/${email}`, {
+      headers: {'x-request-id' : requestId}
+    });
     const user = response.data;
 
     if (!user) {
