@@ -59,7 +59,10 @@ exports.getOrderById = (req, res) => {
     });
 
     if (!isManager&&!isEngineer&&currentUser.id!==order.userId){
-          return res.status(403).json({ success: false, error: 'Доступ запрещён' });
+          return res.status(403).json({ 
+            success: false, 
+            error: {code: 403, message: 'Доступ запрещён'}
+        });
     }
     
     res.json({
@@ -75,7 +78,9 @@ exports.createOrder = async (req, res) => {
     const {userId, order, total} = req.body;
 
     if (!userId||!order||!total){
-      return res.status(400).json({ success: false, error: 'Не все поля заполнены' });
+      return res.status(400).json({ 
+        success: false, 
+        error: {code: 400, message: 'Не все поля заполнены'} });
     }
 
     try {
@@ -83,21 +88,23 @@ exports.createOrder = async (req, res) => {
             headers: {authorization: authHeader}
         });
         if (!response.data.success) {
-            return res.status(400).json({
+            return res.status(404).json({
             success: false,
-            error: { code: 400, message: 'Пользователь не найден' }
+            error: { code: 404, message: 'Пользователь не найден' }
             });
         }
         } catch (err) {
-            return res.status(400).json({
+            return res.status(500).json({
                 success: false,
-                error: { code: 400, message: 'Пользователь не найден или сервис недоступен' }
+                error: { code: 500, message: 'Пользователь не найден или сервис недоступен' }
             });
     }
 
     const isManager = currentUser.roles.includes(1); 
     if (!isManager&&currentUser.id!==userId){
-        return res.status(403).json({ success: false, error: 'Доступ запрещён' });
+        return res.status(403).json({ 
+            success: false, 
+            error: {code: 403, message: 'Доступ запрещён'} });
     }
 
 
@@ -135,23 +142,31 @@ exports.updateOrder = async (req, res) => {
     const isEngineer = currentUser.roles.includes(2);
     const isClient = !isManager&&!isEngineer; 
     if (isClient && currentUser.id !== orders[orderIndex].userId) {
-      return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+      return res.status(403).json({ 
+        success: false, 
+        error: {code:403, message: 'Нет прав на редактирование этого заказа'} });
     }
 
     if (order) {
         if (!isManager) updates.order = order;
-        else return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+        else return res.status(403).json({ 
+            success: false, 
+            error: {code:403, message: 'Нет прав на редактирование этого заказа'} });
     }
     if (total) {
         if (isManager) updates.total = total;
-        else return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+        else return res.status(403).json({ 
+            success: false, 
+            error: {code:403, message: 'Нет прав на редактирование этого заказа'} });
     }
     if (status) {
         if (isClient){
             const current = orders[orderIndex].status;
             const allowed = (current === "Создан" && status === "Отменен");
             if (!allowed) {
-                return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+                return res.status(403).json({ 
+                    success: false, 
+                    error: {code:403, message: 'Нет прав на редактирование этого заказа'} });
             }
         }
         if (isEngineer) {
@@ -161,7 +176,9 @@ exports.updateOrder = async (req, res) => {
                 (current === "В работе" && ["Выполнен", "Отменен"].includes(status));
 
             if (!allowed) {
-                return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого заказа' });
+                return res.status(403).json({ 
+                    success: false, 
+                    error: {code:403, message: 'Нет прав на редактирование этого заказа'} });
             }
         }
         updates.status = status;

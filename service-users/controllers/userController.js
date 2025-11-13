@@ -84,7 +84,9 @@ exports.getUserById = (req, res) => {
 
   
     if (!isManager&&currentUser.id!==user.id){
-          return res.status(403).json({ success: false, error: 'Доступ запрещён' });
+          return res.status(403).json({ 
+            success: false, 
+            error: {code: 404, message: 'Доступ запрещен'} });
     }
     res.json({
         success: true,
@@ -113,7 +115,7 @@ exports.getUserByEmail = async (req, res) => {
     console.error('Ошибка при поиске пользователя по email:', error.message);
     return res.status(500).json({
       success: false,
-      error: 'Ошибка сервера при поиске пользователя'
+      error: {code: 404, message: 'Ошибка сервера при поиске пользователя'}
     });
   }
 };
@@ -189,7 +191,9 @@ exports.deleteUser = (req, res) => {
   const userIndex = users.findIndex(u => u.id === userId);
   const isManager = currentUser.roles.includes(1);
   if (!isManager && currentUser.id !== userId) {
-    return res.status(403).json({ success: false, error: 'Нет прав на удаление этого пользователя' });
+    return res.status(403).json({ 
+      success: false, 
+      error: {code: 403, message: 'Нет прав на удаление этого пользователя'} });
   }
   if (userIndex === -1) return res.status(404).json({ 
     success: false, 
@@ -200,7 +204,7 @@ exports.deleteUser = (req, res) => {
     if (allManagers.length <= 1) {
       return res.status(400).json({
         success: false,
-        error: 'Невозможно удалить последнего менеджера'
+        error: {code: 400, message: 'Невозможно удалить последнего менеджера'}
       });
     }
   }
