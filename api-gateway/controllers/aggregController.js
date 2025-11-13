@@ -4,11 +4,20 @@ const { USERS_SERVICE_URL, ORDERS_SERVICE_URL } = require('../config/services');
 
 exports.getUserWithOrders = async (req, res) => {
   try {
+    const token = req.headers.authorization;
     const userId = req.params.userId;
 
-    const userPromise = usersCircuit.fire(`${USERS_SERVICE_URL}/users/${userId}`);
+    const userPromise = usersCircuit.fire(`${USERS_SERVICE_URL}/users/${userId}`,
+      {
+        headers: {authorization: token}
+      }
+    );
     const ordersPromise = ordersCircuit
-      .fire(`${ORDERS_SERVICE_URL}/orders`)
+      .fire(`${ORDERS_SERVICE_URL}/orders`, 
+        {
+          headers: {authorization: token}
+        }
+      )
       .then(response => {
         const orders = response.data || [];
         return orders.filter(order => order.userId == userId);
@@ -16,8 +25,8 @@ exports.getUserWithOrders = async (req, res) => {
 
     const [userResponse, userOrders] = await Promise.all([userPromise, ordersPromise]);
 
-    if (!userResponse || userResponse.success === false || userResponse.error === 'Пользователь не найден') {
-      return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+    if (!userResponse || !userResponse.success) {
+      return res.status(userResponse.error?.code || 400).json(userResponse)
     }
 
     const user = userResponse.data || userResponse;
