@@ -34,9 +34,19 @@ function getUserFromToken(req) {
 exports.getAllOrders = (req, res) => {
     let orders = readJSON(ordersData);
     const userId = req.query.userId;
-
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const statusFilter = req.query.status;
     if (userId) {
         orders = orders.filter(o => o.userId===userId);
+    }
+    if (statusFilter) {
+        orders = orders.filter(o => o.status===statusFilter);
+    }
+    if (page&&limit) {
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      orders = orders.slice(startIndex, endIndex);
     }
     res.json({
         success: true,
