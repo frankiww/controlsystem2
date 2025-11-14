@@ -7,6 +7,7 @@ const dataPath = path.join(process.cwd(),'data');
 const ordersData = path.join(dataPath, 'orders.json');
 const { JWT_SECRET } = require('../config/jwt');
 const { USERS_SERVICE_URL } = require('../config/services');
+const { publishEvent } = require('../events/publisher');
 
 
 function readJSON(file) {
@@ -132,7 +133,13 @@ exports.createOrder = async (req, res) => {
     orders.push(newOrder);
     writeJSON(ordersData, orders);
 
-    res.status(201).json({
+    publishEvent('order.created', {
+        orderId: newOrder.id,
+        userId: newOrder.userId,
+        status: newOrder.status
+    });
+
+    return res.status(201).json({
         success: true, data: newOrder});
 };
 //обновить
@@ -203,7 +210,13 @@ exports.updateOrder = async (req, res) => {
     orders[orderIndex] = updateOrder;
     writeJSON(ordersData, orders);
 
-    res.status(200).json({success: true, data: updateOrder});
+    publishEvent('order.updated', {
+        orderId: updateOrder.id,
+        userId: updateOrder.userId,
+        newStatus: updateOrder.status
+    });
+
+    return res.status(200).json({success: true, data: updateOrder});
 };
 //удалить
 exports.deleteOrder = (req, res) => {
