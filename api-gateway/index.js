@@ -21,12 +21,12 @@ app.use(cors({
     exposedHeaders: ['X-Request-ID']
 }));
 app.use(requestIdMiddleware);
-app.use('/auth', authRoutes);
+app.use('/v1/auth', authRoutes);
 
 app.use(authMiddleware);
-app.use('/users', aggregRoutes);
-app.use('/users', userRoutes);
-app.use('/orders', orderRoutes);
+app.use('/v1/users', aggregRoutes);
+app.use('/v1/users', userRoutes);
+app.use('/v1/orders', orderRoutes);
 
 
 
