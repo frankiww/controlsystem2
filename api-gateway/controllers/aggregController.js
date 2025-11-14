@@ -5,43 +5,39 @@ const { USERS_SERVICE_URL, ORDERS_SERVICE_URL } = require('../config/services');
 exports.getUserWithOrders = async (req, res) => {
   try {
     const token = req.headers.authorization;
+    const requestId = req.requestId;
     const userId = req.params.userId;
+    const params = new URLSearchParams(req.query);
 
-    const userPromise = usersCircuit.fire(`${USERS_SERVICE_URL}/users/${userId}`,
-      {
-        headers: {authorization: token}
-      }
-    );
-    const ordersPromise = ordersCircuit
-      .fire(`${ORDERS_SERVICE_URL}/orders`, 
-        {
-          headers: {authorization: token}
-        }
-      )
-      .then(response => {
-        const orders = response.data || [];
-        return orders.filter(order => order.userId == userId);
-      });
-
-    const [userResponse, userOrders] = await Promise.all([userPromise, ordersPromise]);
-
-    if (!userResponse || !userResponse.success) {
-      return res.status(userResponse.error?.code || 400).json(userResponse)
+    let user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users/${userId}`, {
+      headers: {authorization: token, 'x-request-id' : requestId}
+    });
+    if (!user.success){
+      return res.status(user.error?.code || 400).json(user)
     }
 
-    const user = userResponse.data || userResponse;
-
+    params.set('userId', userId);
+    const queryString = params.toString();
+    let orders = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders${queryString ? '?' + queryString : ''}`, {
+      headers: {authorization: token, 'x-request-id' : requestId}
+    });
+    if (!orders.success){
+      return res.status(orders.error?.code || 400).json(orders)
+    }
+    user = user.data;
+    orders = orders.data;
+    
     return res.json({
       success: true,
       data: {
         user,
-        orders: userOrders
+        orders
       }
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      error: 'Internal server error'
+      error: {code: 500, message: 'Internal server error'}
     });
   }
 };

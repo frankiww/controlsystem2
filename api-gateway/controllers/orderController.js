@@ -4,7 +4,8 @@ const ordersCircuit = require('../circuits/ordersCircuit');
 exports.getAllOrders = async (req, res) => {
   try {
     const requestId = req.requestId;
-    const orders = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders`, {
+    const queryString = new URLSearchParams(req.query).toString();
+    const orders = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders${queryString ? '?' + queryString : ''}`, {
       headers: {'x-request-id' : requestId}
     });
     if (!orders.success){
