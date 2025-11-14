@@ -86,7 +86,7 @@ exports.getUserById = (req, res) => {
     if (!isManager&&currentUser.id!==user.id){
           return res.status(403).json({ 
             success: false, 
-            error: {code: 404, message: 'Доступ запрещен'} });
+            error: {code: 403, message: 'Доступ запрещен'} });
     }
     res.json({
         success: true,
@@ -115,7 +115,7 @@ exports.getUserByEmail = async (req, res) => {
     console.error('Ошибка при поиске пользователя по email:', error.message);
     return res.status(500).json({
       success: false,
-      error: {code: 404, message: 'Ошибка сервера при поиске пользователя'}
+      error: {code: 500, message: 'Ошибка сервера при поиске пользователя'}
     });
   }
 };
@@ -125,7 +125,7 @@ exports.createUser = async (req, res) => {
     const {email, password, name, roles} = req.body;
 
     if (users.some(u => u.email === email)) {
-        return res.status(404).json({ success: false, error: { code: 404, message: 'Этот email уже используется' } });
+        return res.status(409).json({ success: false, error: { code: 409, message: 'Этот email уже используется' } });
     }
 
     const { v4: uuid } = await import('uuid');
@@ -159,13 +159,15 @@ exports.updateUser = async (req, res) => {
 
     const isManager = currentUser.roles.includes(1);
     if (!isManager && currentUser.id !== userId) {
-      return res.status(403).json({ success: false, error: 'Нет прав на редактирование этого пользователя' });
+      return res.status(403).json({ 
+        success: false, 
+        error: {code: 403, message: 'Нет прав на редактирование этого пользователя'} });
     }
 
     const updates = {};
     if (email) {
       if (users.some(u => u.email === email)) {
-        return res.status(404).json({ success: false, error: { code: 404, message: 'Этот email уже используется' } });
+        return res.status(409).json({ success: false, error: { code: 409, message: 'Этот email уже используется' } });
       }
       updates.email = email;
     }
