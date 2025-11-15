@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config/jwt');
+const { userValidation } = require('../validation/userValidation');
 
 
 const dataPath = path.join(process.cwd(),'data');
@@ -121,8 +122,15 @@ exports.getUserByEmail = async (req, res) => {
 };
 //добавить
 exports.createUser = async (req, res) => {
+    const parseResult = userValidation.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({
+        code: 400,
+        message: parseResult.error.issues
+      });
+    }
     const users = readJSON(usersData);
-    const {email, password, name, roles} = req.body;
+    const {email, password, name, roles} = parseResult.data;
 
     if (users.some(u => u.email === email)) {
         return res.status(409).json({ success: false, error: { code: 409, message: 'Этот email уже используется' } });
@@ -132,7 +140,7 @@ exports.createUser = async (req, res) => {
     const newUser = {
         id: uuid(),
         email,
-        password: password,
+        password,
         name,
         roles,
         date_of_creation: new Date().toISOString(),
@@ -147,10 +155,17 @@ exports.createUser = async (req, res) => {
 };
 //обновить
 exports.updateUser = async (req, res) => {
+  const parseResult = userValidation.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({
+        code: 400,
+        message: parseResult.error.issues
+      });
+    }
     const currentUser = getUserFromToken(req);
     const users = readJSON(usersData);
     const userId = req.params.userId;
-    const {email, name, roles} = req.body;
+    const {email, name, roles} = parseResult.data;
 
     const userIndex = users.findIndex(u => u.id === userId);
     if (userIndex === -1) return res.status(404).json({ 
