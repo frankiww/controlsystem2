@@ -8,6 +8,8 @@ const ordersData = path.join(dataPath, 'orders.json');
 const { JWT_SECRET } = require('../config/jwt');
 const { USERS_SERVICE_URL } = require('../config/services');
 const { publishEvent } = require('../events/publisher');
+const { orderValidation } = require('../validation/orderValidation');
+
 
 
 function readJSON(file) {
@@ -83,10 +85,17 @@ exports.getOrderById = (req, res) => {
 };
 //добавить
 exports.createOrder = async (req, res) => {
+    const parseResult = orderValidation.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({
+        code: 400,
+        message: parseResult.error.issues
+      });
+    }
     const authHeader = req.headers.authorization;
     const currentUser = getUserFromToken(req);
     const orders = readJSON(ordersData);
-    const {userId, order, total} = req.body;
+    const {userId, order, total} = parseResult.data;
 
     if (!userId||!order||!total){
       return res.status(400).json({ 
@@ -144,10 +153,17 @@ exports.createOrder = async (req, res) => {
 };
 //обновить
 exports.updateOrder = async (req, res) => {
+    const parseResult = orderValidation.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({
+        code: 400,
+        message: parseResult.error.issues
+      });
+    }
     const currentUser = getUserFromToken(req);
     const orders = readJSON(ordersData);
     const orderId = req.params.orderId;
-    const {order, total, status} = req.body;
+    const {order, total, status} = parseResult.data;
     const updates = {};
 
     const orderIndex = orders.findIndex(o => o.id === orderId);

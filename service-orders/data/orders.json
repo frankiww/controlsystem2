@@ -39,5 +39,18 @@
     "total": 2000,
     "date_of_creation": "2025-11-14T16:07:06.028Z",
     "date_of_update": "2025-11-14T16:07:06.028Z"
+  },
+  {
+    "id": "7e917865-6c94-416a-8f0b-8069a12f6624",
+    "userId": "e6d0830f-3c96-4a98-9fee-17dab313ee38",
+    "order": [
+      {
+        "prod1": 5
+      }
+    ],
+    "status": "Выполнен",
+    "total": 500,
+    "date_of_creation": "2025-11-15T11:56:22.742Z",
+    "date_of_update": "2025-11-15T11:57:39.598Z"
   }
 ]
