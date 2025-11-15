@@ -45,11 +45,11 @@
     "id": "e6d0830f-3c96-4a98-9fee-17dab313ee38",
     "email": "newuser2@mail.ru",
     "password": "$2b$10$9FBY8Vph/otk6ScjoKl4q.0v6edCJTF1Bgpa/4TozTqGWnSwmyj7m",
-    "name": "newUser2",
+    "name": "client",
     "roles": [
       3
     ],
     "date_of_creation": "2025-11-11T10:38:23.729Z",
-    "date_of_update": "2025-11-11T10:38:23.729Z"
+    "date_of_update": "2025-11-15T11:59:58.465Z"
   }
 ]
