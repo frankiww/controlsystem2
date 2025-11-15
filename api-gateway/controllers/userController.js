@@ -41,7 +41,9 @@ exports.createUser = async (req, res) => {
     const { name, password, email, roles } = req.body;
 
     if (!name || !password || !email || !roles) {
-      return res.status(400).json({ success: false, error: 'Не все поля заполнены' });
+      return res.status(400).json({ 
+        success: false, 
+        error: {code: 400, message: 'Не все поля заполнены'} });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await usersCircuit.fire(`${USERS_SERVICE_URL}/users`, {
