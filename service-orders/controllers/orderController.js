@@ -97,12 +97,6 @@ exports.createOrder = async (req, res) => {
     const orders = readJSON(ordersData);
     const {userId, order, total} = parseResult.data;
 
-    if (!userId||!order||!total){
-      return res.status(400).json({ 
-        success: false, 
-        error: {code: 400, message: 'Не все поля заполнены'} });
-    }
-
     try {
         const response = await axios.get(`${USERS_SERVICE_URL}/users/${userId}`, {
             headers: {authorization: authHeader}

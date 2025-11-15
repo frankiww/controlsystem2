@@ -38,15 +38,21 @@ exports.createOrder = async (req, res) => {
   try {
     const requestId = req.requestId;
     const token = req.headers.authorization;
-    const order = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders`, {
+    const { userId, order, total} = req.body;
+    if (!userId||!order||!total){
+      return res.status(400).json({ 
+        success: false, 
+        error: {code: 400, message: 'Не все поля заполнены'} });
+    }
+    const orderRes = await ordersCircuit.fire(`${ORDERS_SERVICE_URL}/orders`, {
       method: 'POST',
       headers: {authorization: token, 'x-request-id' : requestId},
       data: req.body
     });
-    if (!order.success){
-      return res.status(order.error?.code || 400).json(order)
+    if (!orderRes.success){
+      return res.status(orderRes.error?.code || 400).json(orderRes)
     }
-    return res.status(201).json(order);
+    return res.status(201).json(orderRes);
   } catch {
     return res.status(500).json({ error: 'Internal server error' });
   }
