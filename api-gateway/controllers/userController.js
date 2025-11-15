@@ -54,12 +54,9 @@ exports.createUser = async (req, res) => {
         roles
       }
     });
-    if (!user.success) {
-      return res.status(404).json({
-          success: false,
-          error: user.error || 'Ошибка при создании пользователя'
-        });
-      }
+    if (!user.success){
+      return res.status(user.error?.code || 400).json(user)
+    }
     return res.status(201).json(user);
   } catch {
     return res.status(500).json({ error: 'Internal server error' });
