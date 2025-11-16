@@ -5,12 +5,14 @@ exports.checkRoles = (...allowedRoleIds) => {
     const hasAccess = userRoles.some(roleId => allowedRoleIds.includes(roleId));
 
     if (!hasAccess) {
+      req.log.warn({userRoles, requiredR: allowedRoleIds}, "Доступ запрещен");
       return res.status(403).json({
         success: false,
-        error: 'Доступ запрещён: недостаточно прав',
+        error: {cpde: 403, message: 'Доступ запрещён: недостаточно прав'},
       });
     }
 
+    req.log.info("Проверка ролей пройдена");
     next();
   };
 };

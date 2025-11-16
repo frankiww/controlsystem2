@@ -1,5 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+const pino = require('pino');
+const pinoHttp = require('pino-http');
+
+const logger = pino({
+    level: 'info'
+})
 
 const app = express()
 const PORT = process.env.PORT || 8080;
@@ -20,15 +26,24 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-ID'],
     exposedHeaders: ['X-Request-ID']
 }));
-app.use(requestIdMiddleware);
-app.use('/v1/auth', authRoutes);
 
+app.use(requestIdMiddleware);
+app.use(pinoHttp({
+    logger,
+    customProps: (req) => ({requestId: req.requestId})
+}));
+app.use((req,res,next) => {
+    req.log.info(
+        {body: req.body, query: req.query},
+        "Запрос получен шлюзом");
+    next();
+})
+
+app.use('/v1/auth', authRoutes);
 app.use(authMiddleware);
 app.use('/v1/users', aggregRoutes);
 app.use('/v1/users', userRoutes);
 app.use('/v1/orders', orderRoutes);
-
-
 
 app.get('/health', (req, res) => {
     res.json({status: 'API Gateway is running'});
