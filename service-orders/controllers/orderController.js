@@ -112,7 +112,7 @@ exports.createOrder = async (req, res) => {
 
     try {
         const response = await axios.get(`${USERS_SERVICE_URL}/users/${userId}`, {
-            headers: {authorization: authHeader}
+            headers: {authorization: authHeader, 'x-request-id' : req.requestId}
         });
         } catch (err) {
             if (err.response){
