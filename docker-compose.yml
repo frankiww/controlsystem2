@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - '8080:8080'
+    env_file:
+      - ./api-gateway/.env
+    depends_on:
+      - users
+      - orders
+    networks:
+     - internal_net 
+  users:
+    build: ./service-users
+    container_name: service-users
+    ports:
+      - '8000:8000'
+    env_file:
+      - ./service-users/.env
+    networks:
+     - internal_net 
+  orders:
+    build: ./service-orders
+    container_name: service-orders
+    ports:
+      - '8001:8001'
+    env_file:
+      - ./service-orders/.env
+    networks:
+     - internal_net 
+
+networks:
+  internal_net:
+    driver: bridge
